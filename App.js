@@ -1,19 +1,41 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+
+import WelcomeScreen from "./screens/WelcomeScreen";
+import BuildPantry from "./screens/BuildPantry";
+import ResultingRecipes from "./screens/ResultingRecipes";
+import Pantry from "./screens/Pantry";
+
+const Stack = createStackNavigator();
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="WelcomeScreen">
+        <Stack.Screen
+          name="WelcomeScreen"
+          component={WelcomeScreen}
+          options={{ title: "Welcome!" }}
+        />
+        <Stack.Screen
+          name="BuildPantry"
+          component={BuildPantry}
+          options={{ title: "Build Your Pantry" }}
+        />
+        <Stack.Screen
+          name="ResultingRecipes"
+          component={ResultingRecipes}
+          options={{ title: "The Winning Recipes" }}
+        />
+        <Stack.Screen
+          name="Pantry"
+          component={Pantry}
+          options={{ title: "Complete Pantry" }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+//Use Formik to build pantry? https://jaredpalmer.com/formik
