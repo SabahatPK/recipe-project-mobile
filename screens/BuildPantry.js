@@ -1,14 +1,15 @@
-import React, { useState } from "react";
-import { View, StyleSheet, Button } from "react-native";
+import React, { useState, useContext } from "react";
+import { View } from "react-native";
 import { Text } from "react-native-elements";
 import { Picker } from "@react-native-community/picker";
-import { Formik } from "formik";
+
+import FormSubmitContext from "./../components/formSubmitContext";
 
 import CommonHeader from "./../components/commonHeader";
-import CommonCheckbox from "../components/commonCheckbox";
+import MyCheckbox from "../components/commonCheckbox";
 import CommonButton from "./../components/commonButton";
 
-// import dataRecipe from "../assets/data/recipeData.json";
+import dataRecipe from "../assets/data/recipeData.json";
 import buildCategory from "../config/buildIngredientCategoryList.js";
 
 function BuildPantry(props) {
@@ -16,135 +17,137 @@ function BuildPantry(props) {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [indgredientCategories] = useState(buildCategory());
   const [objOfCheckboxes, setObjOfCheckboxes] = useState({});
-  const ingredients = [1, 2, 3];
+  const [justArrayOfIngredients, setJustArrayOfIngredients] = useState([]);
+  const [selectedIngredients, setSelectedIngredients] = useState([]);
+  const [recipes] = useState(dataRecipe);
+  const [winner, setWinner] = useState([]);
+  const [winnerToPrint, setWinnerToPrint] = useState([]);
+  const testContextData = ["This is a test"];
 
-  // function handleProduceChange(choice) {
-  //   let tempCategory = category;
-  //   tempCategory = choice;
+  function handleProduceChange(choice) {
+    let tempCategory = category;
+    tempCategory = choice;
 
-  //   let tempSelectedCategory = indgredientCategories.filter(
-  //     (each) => each.category === tempCategory
-  //   );
-
-  //   const obj = tempSelectedCategory[0]["ingredients"].reduce(
-  //     (o, key) => ({ ...o, [key]: false }),
-  //     {}
-  //   );
-
-  //   let tempObjOfCheckboxes = { ...obj, ...objOfCheckboxes };
-
-  //   setCategory(tempCategory);
-  //   setSelectedCategory(tempSelectedCategory);
-  //   setObjOfCheckboxes(tempObjOfCheckboxes);
-  // }
-
-  function buildIngredientsChoice(groceryCategory) {
-    console.log(groceryCategory);
-
-    const ingredientsInChosenCategory = indgredientCategories.filter(
-      (each) => each.category === groceryCategory
+    let tempSelectedCategory = indgredientCategories.filter(
+      (each) => each.category === tempCategory
     );
 
     //Middle ground:
-    const justArrayOfIngredients =
-      ingredientsInChosenCategory[0]["ingredients"];
+    const tempJustArrayOfIngredients = tempSelectedCategory[0]["ingredients"];
 
-    // Build obj of ingredients:
-    const objOfIngredientsCheckboxes = ingredientsInChosenCategory[0][
-      "ingredients"
-    ].reduce((o, key) => ({ ...o, [key]: false }), {});
+    const obj = tempSelectedCategory[0]["ingredients"].reduce(
+      (o, key) => ({ ...o, [key]: false }),
+      {}
+    );
 
-    console.log(justArrayOfIngredients);
+    let tempObjOfCheckboxes = { ...obj, ...objOfCheckboxes };
 
-    return justArrayOfIngredients.map((each, index) => (
-      <CommonCheckbox key={index} title={each}></CommonCheckbox>
-    ));
+    setCategory(tempCategory);
+    setSelectedCategory(tempSelectedCategory);
+    setObjOfCheckboxes(tempObjOfCheckboxes);
+    setJustArrayOfIngredients(tempJustArrayOfIngredients);
   }
 
-  //START HERE: Build function that returns array of ingredients per category chosen.
-  //Then, use that array to build one checkbox per ingredient; map()
-  //https://react-native-elements.github.io/react-native-elements/docs/checkbox.html
+  function handleCheckboxChange(ingredientName) {
+    let tempObjOfCheckboxes = { ...objOfCheckboxes };
 
-  const initialValues = {
-    selectedCategory: "",
-  };
+    tempObjOfCheckboxes[ingredientName] = !tempObjOfCheckboxes[ingredientName];
 
-  function handleSubmit() {
-    console.log("Handle submit");
+    let tempSelectedIngredients = selectedIngredients;
+    if (
+      tempObjOfCheckboxes[ingredientName] === true &&
+      tempSelectedIngredients.indexOf(ingredientName) < 0
+    ) {
+      tempSelectedIngredients.push(ingredientName);
+    } else {
+      tempSelectedIngredients.splice(
+        tempSelectedIngredients.indexOf(ingredientName),
+        1
+      );
+    }
+    setSelectedIngredients(tempSelectedIngredients);
+    setObjOfCheckboxes(tempObjOfCheckboxes);
+
+    whoAreTheWinners();
   }
+
+  function whoAreTheWinners() {
+    let tempSelectedIngredients = selectedIngredients;
+
+    let tempWinner = winner;
+    tempWinner = [];
+
+    recipes.forEach(function (recipe) {
+      let totalCount = 0;
+      let match = 0;
+
+      recipe["ingredients"].forEach(function (d) {
+        totalCount += 1;
+
+        if (!(tempSelectedIngredients.indexOf(d[0]) < 0)) {
+          match += 1;
+        }
+      });
+      tempWinner.push([recipe, match / totalCount]);
+    });
+
+    let tempWinnerToPrint = tempWinner.filter((each) => each[1] > 0);
+    setWinner(tempWinner);
+    setWinnerToPrint(tempWinnerToPrint);
+  }
+
+  function createCheckbox(option) {
+    return (
+      <MyCheckbox
+        option={option}
+        value={objOfCheckboxes[option]}
+        onValueChange={() => handleCheckboxChange(option)}
+        key={option}
+      />
+    );
+  }
+
+  function createCheckboxes() {
+    return selectedCategory
+      ? selectedCategory[0]["ingredients"].map(createCheckbox)
+      : null;
+  }
+
+  //START: pass additional props: https://reactnavigation.org/docs/hello-react-navigation#passing-additional-props
 
   return (
     <View>
       <CommonHeader />
 
-      <View>
-        <Formik initialValues={initialValues} onSubmit={handleSubmit}>
-          {(formik) => (
-            <>
-              <View>
-                <Picker
-                  // passing value directly from formik
-                  selectedValue={formik.values.selectedCategory}
-                  // changing value in formik
-                  onValueChange={(itemValue) =>
-                    formik.setFieldValue("selectedCategory", itemValue)
-                  }
-                >
-                  <Picker.Item
-                    label="Select your category"
-                    value={initialValues.selectedCategory}
-                    key={0}
-                  />
+      <Picker
+        selectedValue={1} //OUTS (1 of 2) - update this so dropdown shows category selected.
+        style={{ height: 50, width: 300 }}
+        onValueChange={handleProduceChange}
+      >
+        <Picker.Item label="What's in the pantry?" value="instructions" />
+        <Picker.Item label="Produce" value="produce" />
+        <Picker.Item label="Spices" value="spices" />
+        <Picker.Item label="Meat and Fish" value="meatAndFish" />
+        <Picker.Item label="Grains" value="grains" />
+        <Picker.Item label="Dairy and Eggs" value="dairyAndEggs" />
+        <Picker.Item label="Condiments" value="condiments" />
+      </Picker>
+      {/* OUTS (2 of 2): Remove this once dropdown select always shows category selected. */}
+      <View>{createCheckboxes()}</View>
 
-                  <Picker.Item label="Produce" value="produce" key={1} />
-                  <Picker.Item label="Spices" value="spices" key={2} />
-                  <Picker.Item
-                    label="Meat and Fish"
-                    value="meatAndFish"
-                    key={3}
-                  />
-                  <Picker.Item label="Grains" value="grains" key={4} />
-                  <Picker.Item
-                    label="Dairy and Eggs"
-                    value="dairyAndEggs"
-                    key={5}
-                  />
-                  <Picker.Item label="Condiments" value="condiments" key={6} />
-                </Picker>
-              </View>
-              {/* {formik.values.selectedCategory ? (
-                <CommonCheckbox title={formik.values.selectedCategory} />
-              ) : null} */}
-              {formik.values.selectedCategory
-                ? buildIngredientsChoice(formik.values.selectedCategory)
-                : null}
-              {/* submitting formik instead of calling this.handleSubmit directly */}
-              <Button title="Submit" onPress={formik.handleSubmit} />
-            </>
-          )}
-        </Formik>
-      </View>
-
-      {/* <Text style={styles.myText}>{category}:</Text>
-      {ingredients.map((each) => (
-        <CommonCheckbox key={each} />
-      ))} */}
       <CommonButton
         title="Show Pantry"
         onPress={() => props.navigation.navigate("Pantry")}
       />
+
       <CommonButton
         title="Show Recipes"
-        onPress={() => props.navigation.navigate("ResultingRecipes")}
+        onPress={(testContextData) =>
+          props.navigation.navigate("WrapResultingRecipes")
+        }
       />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  myText: {
-    fontSize: 20,
-  },
-});
 
 export default BuildPantry;

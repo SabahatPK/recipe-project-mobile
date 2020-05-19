@@ -1,8 +1,14 @@
 import React from "react";
-import { CheckBox } from "react-native-elements";
+import { View, Text } from "react-native";
+import CheckBox from "@react-native-community/checkbox";
 
-function CommonCheckbox(props) {
-  return <CheckBox title={props.title} checked={true} />;
-}
+const MyCheckbox = ({ option, value, onValueChange }) => {
+  return (
+    <View>
+      <Text>{option}</Text>
+      <CheckBox value={value} onValueChange={onValueChange} key={option} />
+    </View>
+  );
+};
 
-export default CommonCheckbox;
+export default MyCheckbox;
