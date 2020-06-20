@@ -1,37 +1,36 @@
 import React, { useContext } from "react";
-import { View, StyleSheet } from "react-native";
-import { ListItem, Badge } from "react-native-elements";
-
-import FormSubmitContext from "./../components/formSubmitContext";
+import { View, StyleSheet, Text } from "react-native";
+import { ListItem } from "react-native-elements";
+import * as WebBrowser from "expo-web-browser";
 
 import CommonHeader from "../components/commonHeader";
 import CommonButton from "./../components/commonButton";
 
 function ResultingRecipes(props) {
-  const formSubmitData = useContext(FormSubmitContext);
-  console.log("This is formSubmitData: " + formSubmitData);
+  const { item } = props.route.params;
 
-  const winningRecipes = ["Recipe1", "Recipe2", "Recipe3"];
+  //outs: badge does not show correct value
+
   return (
     <View>
       <CommonHeader />
-      <View style={styles.commonScreen}>
-        {winningRecipes.map((each, index) => (
-          <View key={index}>
-            <Badge value="99" status="success" />
-            {/* Make this a URL: */}
-            <ListItem
-              titleStyle={styles.myListItem}
-              key={index}
-              title={each}
-              bottomDivider
-            />
-          </View>
+      <View>
+        {item.winnerToPrint.map((each, index) => (
+          <ListItem
+            key={index}
+            badge={{ value: 33 }}
+            // badge={{ value: () => <Text>{each[0][1]}</Text> }}
+            title={each[0]["recipeName"]}
+            onPress={() => WebBrowser.openBrowserAsync(each[0]["URL"])}
+            bottomDivider
+          />
         ))}
 
         <CommonButton
           title="Go To Pantry"
-          onPress={() => props.navigation.navigate("Pantry")}
+          onPress={() =>
+            props.navigation.navigate("Pantry", item.objOfCheckboxes)
+          }
         />
         <CommonButton
           title="Clear All Recipes"
@@ -47,9 +46,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
-  },
-  myListItem: {
-    fontSize: 20,
   },
 });
 

@@ -1,18 +1,22 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, StyleSheet } from "react-native";
 import { Text } from "react-native-elements";
-// import { NavigationContainer } from "@react-navigation/native";
-// import { createStackNavigator } from "@react-navigation/stack";
 
 import CommonHeader from "../components/commonHeader";
 import CommonButton from "./../components/commonButton";
 
+import WinRecipeContext from "./../context/winRecipeContext";
+
 function WelcomeScreen(props) {
+  const data = useContext(WinRecipeContext);
+  console.log(data);
+
   return (
     <View>
       <CommonHeader />
       <View style={styles.commonScreen}>
         <Text h4>As easy as...</Text>
+        <Text>{data}</Text>
         <CommonButton
           title="STEP 1: Build Pantry"
           onPress={() => props.navigation.navigate("BuildPantry")}

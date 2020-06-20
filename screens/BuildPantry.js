@@ -1,9 +1,6 @@
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import { View } from "react-native";
-import { Text } from "react-native-elements";
 import { Picker } from "@react-native-community/picker";
-
-import FormSubmitContext from "./../components/formSubmitContext";
 
 import CommonHeader from "./../components/commonHeader";
 import MyCheckbox from "../components/commonCheckbox";
@@ -11,6 +8,8 @@ import CommonButton from "./../components/commonButton";
 
 import dataRecipe from "../assets/data/recipeData.json";
 import buildCategory from "../config/buildIngredientCategoryList.js";
+
+import WinRecipeContext from "./../context/winRecipeContext";
 
 function BuildPantry(props) {
   const [category, setCategory] = useState("");
@@ -22,7 +21,6 @@ function BuildPantry(props) {
   const [recipes] = useState(dataRecipe);
   const [winner, setWinner] = useState([]);
   const [winnerToPrint, setWinnerToPrint] = useState([]);
-  const testContextData = ["This is a test"];
 
   function handleProduceChange(choice) {
     let tempCategory = category;
@@ -113,40 +111,42 @@ function BuildPantry(props) {
       : null;
   }
 
-  //START: pass additional props: https://reactnavigation.org/docs/hello-react-navigation#passing-additional-props
-
   return (
-    <View>
-      <CommonHeader />
+    <WinRecipeContext.Provider value={"Placeholder: replace with actual data"}>
+      <View>
+        <CommonHeader />
 
-      <Picker
-        selectedValue={1} //OUTS (1 of 2) - update this so dropdown shows category selected.
-        style={{ height: 50, width: 300 }}
-        onValueChange={handleProduceChange}
-      >
-        <Picker.Item label="What's in the pantry?" value="instructions" />
-        <Picker.Item label="Produce" value="produce" />
-        <Picker.Item label="Spices" value="spices" />
-        <Picker.Item label="Meat and Fish" value="meatAndFish" />
-        <Picker.Item label="Grains" value="grains" />
-        <Picker.Item label="Dairy and Eggs" value="dairyAndEggs" />
-        <Picker.Item label="Condiments" value="condiments" />
-      </Picker>
-      {/* OUTS (2 of 2): Remove this once dropdown select always shows category selected. */}
-      <View>{createCheckboxes()}</View>
+        <Picker
+          selectedValue={1} //OUTS (1 of 2) - update this so dropdown shows category selected.
+          style={{ height: 50, width: 300 }}
+          onValueChange={handleProduceChange}
+        >
+          <Picker.Item label="What's in the pantry?" value="instructions" />
+          <Picker.Item label="Produce" value="produce" />
+          <Picker.Item label="Spices" value="spices" />
+          <Picker.Item label="Meat and Fish" value="meatAndFish" />
+          <Picker.Item label="Grains" value="grains" />
+          <Picker.Item label="Dairy and Eggs" value="dairyAndEggs" />
+          <Picker.Item label="Condiments" value="condiments" />
+        </Picker>
+        {/* OUTS (2 of 2): Remove this once dropdown select always shows category selected. */}
+        <View>{createCheckboxes()}</View>
 
-      <CommonButton
-        title="Show Pantry"
-        onPress={() => props.navigation.navigate("Pantry")}
-      />
+        <CommonButton
+          title="Show Pantry"
+          onPress={() => props.navigation.navigate("Pantry", objOfCheckboxes)}
+        />
 
-      <CommonButton
-        title="Show Recipes"
-        onPress={(testContextData) =>
-          props.navigation.navigate("WrapResultingRecipes")
-        }
-      />
-    </View>
+        <CommonButton
+          title="Show Recipes"
+          onPress={() =>
+            props.navigation.navigate("ResultingRecipes", {
+              item: { winnerToPrint, objOfCheckboxes },
+            })
+          }
+        />
+      </View>
+    </WinRecipeContext.Provider>
   );
 }
 
