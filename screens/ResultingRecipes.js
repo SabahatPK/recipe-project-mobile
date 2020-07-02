@@ -8,18 +8,24 @@ import CommonButton from "./../components/commonButton";
 
 function ResultingRecipes(props) {
   const { item } = props.route.params;
+  console.log("-----item.winnerToPrint----");
+  console.log(item.winnerToPrint);
 
-  //outs: badge does not show correct value
+  const badgeNumber = item.winnerToPrint.length
+    ? (item.winnerToPrint[0][1] * 100).toFixed(2)
+    : null;
 
   return (
     <View>
       <CommonHeader />
+      {item.winnerToPrint.length ? (
+        <ListItem rightTitle={"% of ingredients on hand"} bottomDivider />
+      ) : null}
       <View>
         {item.winnerToPrint.map((each, index) => (
           <ListItem
             key={index}
-            badge={{ value: 33 }}
-            // badge={{ value: () => <Text>{each[0][1]}</Text> }}
+            badge={{ value: () => <Text>{badgeNumber}</Text> }}
             title={each[0]["recipeName"]}
             onPress={() => WebBrowser.openBrowserAsync(each[0]["URL"])}
             bottomDivider
@@ -31,10 +37,6 @@ function ResultingRecipes(props) {
           onPress={() =>
             props.navigation.navigate("Pantry", item.objOfCheckboxes)
           }
-        />
-        <CommonButton
-          title="Clear All Recipes"
-          onPress={() => console.log("Build function to clear all recipes.")}
         />
       </View>
     </View>

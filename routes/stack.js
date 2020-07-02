@@ -12,7 +12,7 @@ function MainStackNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} />
+        {/* <Stack.Screen name="WelcomeScreen" component={WelcomeScreen} /> */}
         <Stack.Screen name="BuildPantry" component={BuildPantry} />
         <Stack.Screen name="ResultingRecipes" component={ResultingRecipes} />
         <Stack.Screen name="Pantry" component={Pantry} />

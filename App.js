@@ -9,5 +9,3 @@ import MainStackNavigator from "./routes/stack";
 export default function App() {
   return <MainStackNavigator />;
 }
-
-//Use Formik to build pantry? https://jaredpalmer.com/formik

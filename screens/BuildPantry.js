@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View } from "react-native";
+import { View, ScrollView } from "react-native";
 import { Picker } from "@react-native-community/picker";
 
 import CommonHeader from "./../components/commonHeader";
@@ -8,8 +8,6 @@ import CommonButton from "./../components/commonButton";
 
 import dataRecipe from "../assets/data/recipeData.json";
 import buildCategory from "../config/buildIngredientCategoryList.js";
-
-import WinRecipeContext from "./../context/winRecipeContext";
 
 function BuildPantry(props) {
   const [category, setCategory] = useState("");
@@ -111,13 +109,19 @@ function BuildPantry(props) {
       : null;
   }
 
+  function emptyPantry() {
+    setObjOfCheckboxes({});
+    setWinner([]);
+    setWinnerToPrint([]);
+  }
+
   return (
-    <WinRecipeContext.Provider value={"Placeholder: replace with actual data"}>
+    <ScrollView>
       <View>
         <CommonHeader />
 
         <Picker
-          selectedValue={1} //OUTS (1 of 2) - update this so dropdown shows category selected.
+          selectedValue={category}
           style={{ height: 50, width: 300 }}
           onValueChange={handleProduceChange}
         >
@@ -129,13 +133,14 @@ function BuildPantry(props) {
           <Picker.Item label="Dairy and Eggs" value="dairyAndEggs" />
           <Picker.Item label="Condiments" value="condiments" />
         </Picker>
-        {/* OUTS (2 of 2): Remove this once dropdown select always shows category selected. */}
+
         <View>{createCheckboxes()}</View>
 
         <CommonButton
           title="Show Pantry"
           onPress={() => props.navigation.navigate("Pantry", objOfCheckboxes)}
         />
+        <CommonButton title="Empty Pantry" onPress={() => emptyPantry()} />
 
         <CommonButton
           title="Show Recipes"
@@ -146,7 +151,7 @@ function BuildPantry(props) {
           }
         />
       </View>
-    </WinRecipeContext.Provider>
+    </ScrollView>
   );
 }
 

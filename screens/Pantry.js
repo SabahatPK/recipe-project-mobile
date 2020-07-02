@@ -2,15 +2,9 @@ import React, { useContext } from "react";
 import { View, StyleSheet, Text } from "react-native";
 
 import CommonHeader from "../components/commonHeader";
-import CategoryOfPantry from "../components/eachCategoryOfPantry";
 import CommonButton from "../components/commonButton";
 
-import PantryContext from "./../context/pantryContext";
-import MyCheckbox from "../components/commonCheckbox";
-
 function Pantry(props) {
-  // const pantryInfo = useContext(PantryContext);
-
   const pantryIngredientsObj = props.route.params;
   const pantryIngredientsArr = [];
 
@@ -21,6 +15,9 @@ function Pantry(props) {
   return (
     <View>
       <CommonHeader />
+      {pantryIngredientsArr.length === 0 ? (
+        <Text>No items in pantry</Text>
+      ) : null}
       <View style={styles.commonScreen}>
         {/* One per type of category; maybe in accordian format */}
         {pantryIngredientsArr.map((each, index) => (
@@ -29,10 +26,6 @@ function Pantry(props) {
         <CommonButton
           title="Modify Pantry"
           onPress={() => props.navigation.navigate("BuildPantry")}
-        />
-        <CommonButton
-          title="Empty Pantry"
-          onPress={() => console.log("Add function that empties the pantry.")}
         />
       </View>
     </View>
